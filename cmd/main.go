@@ -33,7 +33,7 @@ var toMongo bool = true
 var messageCount int
 var messageMux sync.Mutex
 var limiter *rate.Limiter
-var batchSize = 250
+var batchSize = 300
 var batchChan = make(chan ShortCode, batchSize)
 var mongo_databse string = ""
 var mongo_collection string = ""
@@ -102,7 +102,7 @@ func main() {
 		}
 	}()
 
-	limiter = rate.NewLimiter(rate.Limit(40), 20)
+	limiter = rate.NewLimiter(rate.Limit(200), 20)
 	mongoClient, err := mongo.Connect(context.Background(), options.Client().SetMaxPoolSize(5).ApplyURI(mongo_uri))
 	if err != nil {
 
