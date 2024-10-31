@@ -25,15 +25,21 @@ spec:
         - containerPort: 8080
         env:
         - name: RABBIT_MQ_CONNECTION_STRING
-          value: rabbitmq
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-default-user
+              key: connection_string
         - name: RABBIT_MQ_QUEUE_NAME
-          value: "5672"
+          value: "shortener"
         - name: MONGODB_COLLECTION_NAME
-          value: "guest"
+          value: "codes"
         - name: MONGODB_CONNECTION_STRING
-          value: "guest"
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: MONGO_CONNECTION_STRING
         - name: MONGODB_DATABASE_NAME
-          value: "gosumer"
+          value: "short-codes"
         resources:
             requests:
                 memory: "64Mi"
