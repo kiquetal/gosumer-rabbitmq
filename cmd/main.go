@@ -33,7 +33,7 @@ var toMongo bool = true
 var messageCount int
 var messageMux sync.Mutex
 var limiter *rate.Limiter
-var batchSize = 100
+var batchSize = 250
 var batchChan = make(chan ShortCode, batchSize)
 var mongo_databse string = ""
 var mongo_collection string = ""
@@ -115,7 +115,7 @@ func main() {
 		return
 	}
 	var wg sync.WaitGroup
-	var numConsumers = 15
+	var numConsumers = 20
 	for i := 0; i < numConsumers; i++ {
 		wg.Add(1)
 		go consume(msg, &wg)
@@ -156,7 +156,7 @@ func insertBatch(batch []interface{}, mongoClient *mongo.Client) error {
 		return nil
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	collection := mongoClient.Database(mongo_databse).Collection(mongo_collection)
 	if _, err := collection.InsertMany(ctx, batch); err != nil {
