@@ -85,7 +85,7 @@ func main() {
 	defer conn.Close()
 	go batchInsert()
 	ch, err := conn.Channel()
-	if err != nil {
+:q	if err != nil {
 		fmt.Println("Failed to create channel: ", err)
 		return
 	}
