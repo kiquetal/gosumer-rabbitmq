@@ -71,7 +71,7 @@ func main() {
 		return
 	}
 
-	limiter = rate.NewLimiter(rate.Limit(30), 20)
+	limiter = rate.NewLimiter(rate.Limit(40), 20)
 	mongoClient, err := mongo.Connect(context.Background(), options.Client().SetMaxPoolSize(5).ApplyURI(mongo_uri))
 	if err != nil {
 
@@ -115,7 +115,7 @@ func main() {
 		return
 	}
 	var wg sync.WaitGroup
-	var numConsumers = 20
+	var numConsumers = 10
 	for i := 0; i < numConsumers; i++ {
 		wg.Add(1)
 		go consume(msg, &wg)
