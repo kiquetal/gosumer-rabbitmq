@@ -4,35 +4,37 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"os"
+	"sync"
+	"time"
+
 	"github.com/joho/godotenv"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/streadway/amqp"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/time/rate"
-	"net/http"
-	"os"
-	"sync"
-	"time"
 )
 
 type ShortCode struct {
-	Code      string    `json:"code"`
-	URL       string    `json:"url"`
-	Host      string    `json:"host"`
-	CreatedAt time.Time `json:"createdAt"`
-	ExpiresAt time.Time `json:"expiresAt"`
-	Creator   string    `json:"creator"`
+	Code      string             `json:"code"`
+	URL       string             `json:"url"`
+	Host      string             `json:"host"`
+	CreatedAt time.Time          `json:"createdAt"`
+	ExpiresAt time.Time          `json:"expiresAt"`
+	Creator   primitive.ObjectID `json:"creator"`
 }
 
-var toMongo bool = false
+var toMongo bool = true
 var messageCount int
 var messageMux sync.Mutex
 var limiter *rate.Limiter
 var batchSize = 100
 var batchChan = make(chan ShortCode, batchSize)
-var mongoClient *mongo.Client
 var mongo_databse string = ""
 var mongo_collection string = ""
 
@@ -55,7 +57,7 @@ func main() {
 	fmt.Println("Hello, World!")
 	rabbit_mq := os.Getenv("RABBIT_MQ_CONNECTION_STRING")
 	queue_name := os.Getenv("RABBIT_MQ_QUEUE_NAME")
-	mongo_uri := os.Getenv("MONGO_CONNECTION_STRING")
+	mongo_uri := os.Getenv("MONGODB_CONNECTION_STRING")
 	mongo_databse = os.Getenv("MONGODB_DATABASE_NAME")
 	mongo_collection = os.Getenv("MONGODB_COLLECTION_NAME")
 	fmt.Printf("Mongo URI: %s\n", mongo_uri)
@@ -70,20 +72,17 @@ func main() {
 	}
 
 	limiter = rate.NewLimiter(rate.Limit(30), 20)
-	/*
-		mongoClient, err := mongo.Connect(context.Background(), options.Client().ApplyURI(mongo_uri))
-		if err != nil {
+	mongoClient, err := mongo.Connect(context.Background(), options.Client().SetMaxPoolSize(5).ApplyURI(mongo_uri))
+	if err != nil {
 
-			fmt.Println("Failed to connect to MongoDB: ", err)
-			return
-		}
-
-	*/
+		fmt.Println("Failed to connect to MongoDB: ", err)
+		return
+	}
 
 	defer mongoClient.Disconnect(context.Background())
 
 	defer conn.Close()
-	go batchInsert()
+	go batchInsert(mongoClient)
 	ch, err := conn.Channel()
 	if err != nil {
 		fmt.Println("Failed to create channel: ", err)
@@ -130,7 +129,7 @@ func main() {
 	}
 }
 
-func batchInsert() {
+func batchInsert(mongoClient *mongo.Client) {
 	var batch []interface{}
 	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
@@ -139,19 +138,24 @@ func batchInsert() {
 		case shortCode := <-batchChan:
 			batch = append(batch, shortCode)
 			if len(batch) >= batchSize {
-				insertBatch(batch)
+				insertBatch(batch, mongoClient)
 				batch = nil
 			}
 		case <-ticker.C:
 			if len(batch) > 0 {
-				insertBatch(batch)
+				insertBatch(batch, mongoClient)
 				batch = nil
 			}
 		}
 	}
 }
 
-func insertBatch(batch []interface{}) error {
+func insertBatch(batch []interface{}, mongoClient *mongo.Client) error {
+	if mongoClient == nil {
+		fmt.Println("Mongo client is nil")
+		return nil
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
 	defer cancel()
 	collection := mongoClient.Database(mongo_databse).Collection(mongo_collection)
