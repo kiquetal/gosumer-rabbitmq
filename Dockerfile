@@ -1,5 +1,5 @@
 # Use the official Golang image as the base image
-FROM golang:1.22.3 AS builder
+FROM golang:1.22.2 AS builder
 
 # Enable CGO and set target OS and architecture
 ENV CGO_ENABLED=1

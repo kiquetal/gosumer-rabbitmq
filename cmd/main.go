@@ -84,7 +84,7 @@ func main() {
 	defer conn.Close()
 	go batchInsert(mongoClient)
 	ch, err := conn.Channel()
-:q	if err != nil {
+	if err != nil {
 		fmt.Println("Failed to create channel: ", err)
 		return
 	}
