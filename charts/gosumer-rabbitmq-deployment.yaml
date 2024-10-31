@@ -42,4 +42,4 @@ spec:
                 memory: "1Gi"
                 cpu: "1m"
       imagePullSecrets:
-        - name: gitlab-registry
+        - name: edge-registry
