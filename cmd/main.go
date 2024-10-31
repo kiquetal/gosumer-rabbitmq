@@ -49,6 +49,11 @@ var (
 	})
 )
 
+const (
+	MaxReconnectDelay     = 60 * time.Second
+	InitialReconnectDelay = 1 * time.Second
+)
+
 func main() {
 	err := godotenv.Load()
 	if err != nil {
@@ -65,11 +70,37 @@ func main() {
 	fmt.Printf("Mongo Collection: %s\n", mongo_collection)
 	fmt.Printf("Queue Name: %s\n", queue_name)
 	fmt.Println("RabbitMQ Connection String: ", rabbit_mq)
-	conn, err := amqp.Dial(rabbit_mq)
+
+	conn, err := connectRabbitMQ(rabbit_mq)
 	if err != nil {
-		fmt.Println("Failed to connect to RabbitMQ: ", err)
+		fmt.Println("Failed to connect to RabbitMQ:", err)
 		return
 	}
+	defer conn.Close()
+
+	closeChan := make(chan *amqp.Error)
+	conn.NotifyClose(closeChan)
+
+	// Your existing code for setting up channels and consuming messages goes here
+
+	go func() {
+		for {
+			err := <-closeChan
+			if err != nil {
+				fmt.Println("RabbitMQ connection closed. Reconnecting...")
+				var reconnectErr error
+				conn, reconnectErr = connectRabbitMQ(rabbit_mq)
+				if reconnectErr != nil {
+					fmt.Println("Failed to reconnect:", reconnectErr)
+					time.Sleep(time.Second) // Add a delay before retrying
+					continue
+				}
+				// Set up the new close notification channel
+				closeChan = make(chan *amqp.Error)
+				conn.NotifyClose(closeChan)
+			}
+		}
+	}()
 
 	limiter = rate.NewLimiter(rate.Limit(40), 20)
 	mongoClient, err := mongo.Connect(context.Background(), options.Client().SetMaxPoolSize(5).ApplyURI(mongo_uri))
@@ -213,4 +244,26 @@ func writeToMongo(d amqp.Delivery) error {
 	batchChan <- shortCode
 
 	return nil
+}
+
+func connectRabbitMQ(url string) (*amqp.Connection, error) {
+	var conn *amqp.Connection
+	var err error
+	reconnectDelay := InitialReconnectDelay
+
+	for {
+		conn, err = amqp.Dial(url)
+		if err == nil {
+			return conn, nil
+		}
+
+		fmt.Printf("Failed to connect to RabbitMQ: %s. Retrying in %v...\n", err, reconnectDelay)
+		time.Sleep(reconnectDelay)
+
+		// Implement exponential backoff
+		reconnectDelay *= 2
+		if reconnectDelay > MaxReconnectDelay {
+			reconnectDelay = MaxReconnectDelay
+		}
+	}
 }
