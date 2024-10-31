@@ -1,0 +1,109 @@
+[33mcommit 1c031286ecd3a737c6c4209931fa07a29bfb764e[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31medge/main[m[33m)[m
+Author: kiquetal <kiquetal@gmail.com>
+Date:   Thu Oct 31 10:11:53 2024 -0300
+
+    dockerfile¨
+
+[33mcommit 5c9959f032792656e417adb4dfd4a89194916f15[m[33m ([m[1;31morigin/main[m[33m)[m
+Author: kiquetal <kiquetal@gmail.com>
+Date:   Thu Oct 31 09:53:57 2024 -0300
+
+    fix code
+
+[33mcommit 02cd2ba64ff24713c5f091bc56ef7b4272234efe[m
+Merge: de7bd13 c12f5ba
+Author: kiquetal <kiquetal@gmail.com>
+Date:   Thu Oct 31 09:39:30 2024 -0300
+
+    Merge branch 'main' of gitlab-edge:edge-codes/gosumer-rabbitmq
+
+[33mcommit de7bd13edb497c1b7c88de0dfe072e1c6ab7e5fa[m
+Author: kiquetal <kiquetal@gmail.com>
+Date:   Thu Oct 31 09:35:49 2024 -0300
+
+    from local
+
+[33mcommit c12f5ba29c0cbf886296439014517bfa5c3cb274[m
+Author: elvus <lvssgv@gmail.com>
+Date:   Thu Oct 31 09:16:33 2024 -0300
+
+    fix: mongo
+
+[33mcommit 4278fd716e38fc6fcfe23f6ac9414cb330fab0c1[m
+Author: kiquetal <kiquetal@gmail.com>
+Date:   Thu Oct 31 08:30:13 2024 -0300
+
+    Updating the deployment for edge
+
+[33mcommit f39d783b99021368ca709ef9cca7803fa374746a[m
+Author: kiquetal <kiquetal@gmail.com>
+Date:   Thu Oct 31 08:27:23 2024 -0300
+
+    Updating the deployment
+
+[33mcommit 2bead80edc71458b70ede644445b48129c7924e7[m
+Author: kiquetal <kiquetal@gmail.com>
+Date:   Thu Oct 31 08:25:49 2024 -0300
+
+    Updating the README.md
+
+[33mcommit 466dd2ec0e614a102e0c7455eaa3dcf600503337[m
+Author: kiquetal <kiquetal@gmail.com>
+Date:   Thu Oct 31 08:22:53 2024 -0300
+
+    Adding service for k8s
+
+[33mcommit f6a988d3ac3c7d69c5de24cf42a1cd84e50d0b58[m
+Author: kiquetal <kiquetal@gmail.com>
+Date:   Thu Oct 31 08:07:58 2024 -0300
+
+    fix the workflow
+
+[33mcommit fb185d81f7d6658fa2ae6f0b3e61a2dc6154ff10[m
+Author: kiquetal <kiquetal@gmail.com>
+Date:   Thu Oct 31 08:06:31 2024 -0300
+
+    rneaming thr file
+
+[33mcommit b2b763d44c5eb1f5a8a929a8024bc0319bd1ab07[m
+Author: kiquetal <kiquetal@gmail.com>
+Date:   Thu Oct 31 08:04:27 2024 -0300
+
+    Adding gitlab workflow
+
+[33mcommit 1af4ad98f089a3907e466b8297f44f2976fef48d[m
+Merge: 8100de3 19d4d9e
+Author: kiquetal <kiquetal@gmail.com>
+Date:   Thu Oct 31 07:42:34 2024 -0300
+
+    Merge remote-tracking branch 'edge/main'
+
+[33mcommit 19d4d9e2b56c9cd828a462d953317d68773d185c[m
+Author: kiquetal <enrique.melgarejo@edge.com.py>
+Date:   Thu Oct 31 07:35:08 2024 -0300
+
+    Initial commit
+
+[33mcommit 8100de34a6714273b6aa5fedc44aa13650f846dc[m
+Author: kiquetal <kiquetal@gmail.com>
+Date:   Wed Oct 30 19:34:04 2024 -0300
+
+    foreget .env
+
+[33mcommit ea115facd50b21798281e0f5656d1e95b843a774[m
+Author: kiquetal <kiquetal@gmail.com>
+Date:   Wed Oct 30 19:26:24 2024 -0300
+
+    git ignopre
+
+[33mcommit 36d2b56d93b30738b58de51b3d006e48b0a4e224[m
+Author: kiquetal <kiquetal@gmail.com>
+Date:   Wed Oct 30 19:24:22 2024 -0300
+
+    adding dockerfile
+
+[33mcommit ccaebbe7b96c8475c9c978d47cc71d4dfdcd8349[m
+Author: kiquetal <kiquetal@gmail.com>
+Date:   Wed Oct 30 19:14:37 2024 -0300
+
+    Adding mod
