@@ -95,7 +95,9 @@ func main() {
 		false,
 		false,
 		false,
-		nil,
+		amqp.Table{
+			"x-queue-type": "quorum",
+		},
 	)
 	if err != nil {
 		fmt.Println("Failed to declare queue: ", err)
