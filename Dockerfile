@@ -1,17 +1,6 @@
 # Use the official Golang image as the base image
 FROM golang:1.22.2 AS builder
 
-# Enable CGO and set target OS and architecture
-ENV CGO_ENABLED=1
-ENV GOOS=linux
-ENV GOARCH=amd64
-
-# Install necessary dependencies for CGO
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    gcc \
-    libc6-dev
-
 # Set the working directory inside the container
 WORKDIR /app
 
@@ -23,25 +12,25 @@ RUN go mod download
 COPY . .
 
 # Build the Go application
-RUN go build -o main cmd/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o main cmd/main.go
 
 # Use a minimal base image for the final container
-FROM scratch
+FROM alpine:latest
 
 # Set the working directory inside the container
 WORKDIR /app
 
 # Copy the built Go binary from the builder stage
 COPY --from=builder /app/main .
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 # Expose the port the application runs on
 EXPOSE 8080
-ENV RABBIT_MQ_CONNECTION_STRING replace
-ENV RABBIT_MQ_QUEUE_NAME replace
-ENV MONGODB_COLLECTION_NAME replace
-ENV MONGODB_CONNECTION_STRING replace
-ENV MONGODB_DATABASE_NAME replace
+
+ENV RABBIT_MQ_CONNECTION_STRING amqp://default_user_IlR2D-NZ6d5U0tWa34m:9ZH8eHWc3bmpCxrbboHArn3qiUP1VieK@localhost:5672/
+ENV RABBIT_MQ_QUEUE_NAME shortener
+ENV MONGODB_COLLECTION_NAME documents
+ENV MONGODB_CONNECTION_STRING mongodb://admin:admin@localhost:27017
+ENV MONGODB_DATABASE_NAME documents
 
 
 # Command to run the application
