@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: gosumer-rabbitmq
-        image: registry.gitlab.com/short/gosumer-rabbitmq:latest
+        image: registry.gitlab.edge.com.py/edge-codes/gosumer-rabbitmq:latest
         ports:
         - containerPort: 8080
         env:
