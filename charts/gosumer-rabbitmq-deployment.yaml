@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gosumer-rabbitmq
+  labels:
+    app: gosumer-rabbitmq
+  namespace: short
+spec:
+  selector:
+    matchLabels:
+      app: gosumer-rabbitmq
+  template:
+    metadata:
+      labels:
+        app: gosumer-rabbitmq
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: gosumer-rabbitmq
+        image: registry.gitlab.com/short/gosumer-rabbitmq:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: RABBIT_MQ_CONNECTION_STRING
+          value: rabbitmq
+        - name: RABBIT_MQ_QUEUE_NAME
+          value: "5672"
+        - name: MONGODB_COLLECTION_NAME
+          value: "guest"
+        - name: MONGODB_CONNECTION_STRING
+          value: "guest"
+        - name: MONGODB_DATABASE_NAME
+          value: "gosumer"
+        resources:
+            requests:
+                memory: "64Mi"
+                cpu: "250m"
+            limits:
+                memory: "1Gi"
+                cpu: "1m"
+      imagePullSecrets:
+        - name: gitlab-registry
