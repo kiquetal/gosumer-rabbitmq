@@ -6,6 +6,7 @@ metadata:
     app: gosumer-rabbitmq
   namespace: short
 spec:
+  replicas: 2
   selector:
     matchLabels:
       app: gosumer-rabbitmq
@@ -18,7 +19,6 @@ spec:
         prometheus.io/port: "8080"
         prometheus.io/path: "/metrics"
     spec:
-      replicas: 2
       containers:
       - name: gosumer-rabbitmq
         image: registry.gitlab.edge.com.py/edge-codes/gosumer-rabbitmq:latest
