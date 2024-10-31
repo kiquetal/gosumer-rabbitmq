@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/joho/godotenv"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/streadway/amqp"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/time/rate"
@@ -32,6 +35,17 @@ var batchChan = make(chan ShortCode, batchSize)
 var mongoClient *mongo.Client
 var mongo_databse string = ""
 var mongo_collection string = ""
+
+var (
+	messagesProcessed = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "messages_processed_total",
+		Help: "The total number of processed messages",
+	})
+	mongoInserts = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "mongo_inserts_total",
+		Help: "The total number of inserts to MongoDB",
+	})
+)
 
 func main() {
 	err := godotenv.Load()
@@ -108,6 +122,7 @@ func main() {
 		go consume(msg, &wg)
 	}
 	http.HandleFunc("/", handleFunction)
+	http.Handle("/metrics", promhttp.Handler())
 	go http.ListenAndServe(":8080", nil)
 
 	for {
@@ -145,6 +160,7 @@ func insertBatch(batch []interface{}) error {
 		return err
 	}
 	fmt.Println("Inserted batch of ", len(batch), " documents")
+	mongoInserts.Add(float64(len(batch)))
 	return nil
 }
 
@@ -163,16 +179,13 @@ func consume(msg <-chan amqp.Delivery, wg *sync.WaitGroup) {
 			continue
 		}
 
-		messageMux.Lock()
-		messageCount++
-		messageMux.Unlock()
 		fmt.Println("Received message: ", string(d.Body))
 		var shortCode ShortCode
 		if err := json.Unmarshal(d.Body, &shortCode); err != nil {
 			fmt.Printf("failed to unmarshal JSON: %v", err)
 		}
 		fmt.Println("ShortCode: ", shortCode.Code)
-
+		messagesProcessed.Inc()
 		if toMongo {
 			if err := writeToMongo(d); err != nil {
 				fmt.Println("Failed to write to MongoDB: ", err)
