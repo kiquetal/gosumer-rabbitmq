@@ -102,7 +102,7 @@ func main() {
 		}
 	}()
 
-	limiter = rate.NewLimiter(rate.Limit(200), 20)
+	limiter = rate.NewLimiter(rate.Limit(150), 20)
 	mongoClient, err := mongo.Connect(context.Background(), options.Client().SetMaxPoolSize(5).ApplyURI(mongo_uri))
 	if err != nil {
 
